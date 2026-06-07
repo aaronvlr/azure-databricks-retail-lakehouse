@@ -1,0 +1,788 @@
+{
+  "datasets": [
+    {
+      "name": "0ca96e81",
+      "displayName": "route revenue",
+      "queryLines": [
+        "SELECT\n",
+        "  T.pickup_zip,\n",
+        "  T.dropoff_zip,\n",
+        "  T.route as `Route`,\n",
+        "  T.frequency as `Number Trips`,\n",
+        "  T.total_fare as `Total Revenue`\n",
+        "FROM\n",
+        "  (\n",
+        "    SELECT\n",
+        "      pickup_zip,\n",
+        "      dropoff_zip,\n",
+        "      concat(pickup_zip, '-', dropoff_zip) AS route,\n",
+        "      count(*) as frequency,\n",
+        "      SUM(fare_amount) as total_fare\n",
+        "    FROM\n",
+        "      `samples`.`nyctaxi`.`trips`\n",
+        "    GROUP BY\n",
+        "       1,2,3\n",
+        "  ) T\n",
+        "ORDER BY\n",
+        "  1 ASC"
+      ]
+    },
+    {
+      "name": "3f5450e6",
+      "displayName": "trips",
+      "queryLines": [
+        "SELECT\n",
+        "  T.tpep_pickup_datetime,\n",
+        "  T.tpep_dropoff_datetime,\n",
+        "  T.fare_amount,\n",
+        "  T.pickup_zip,\n",
+        "  T.dropoff_zip,\n",
+        "  T.trip_distance,\n",
+        "  T.weekday,\n",
+        "  CASE\n",
+        "    WHEN T.weekday = 1 THEN 'Sunday'\n",
+        "    WHEN T.weekday = 2 THEN 'Monday'\n",
+        "    WHEN T.weekday = 3 THEN 'Tuesday'\n",
+        "    WHEN T.weekday = 4 THEN 'Wednesday'\n",
+        "    WHEN T.weekday = 5 THEN 'Thursday'\n",
+        "    WHEN T.weekday = 6 THEN 'Friday'\n",
+        "    WHEN T.weekday = 7 THEN 'Saturday'\n",
+        "    ELSE 'N/A'\n",
+        "  END AS day_of_week\n",
+        "FROM\n",
+        "  (\n",
+        "    SELECT\n",
+        "      dayofweek(tpep_pickup_datetime) as weekday,\n",
+        "      *\n",
+        "    FROM\n",
+        "      `samples`.`nyctaxi`.`trips`\n",
+        "    WHERE\n",
+        "      trip_distance > 0\n",
+        "      AND trip_distance < 10\n",
+        "      AND fare_amount > 0\n",
+        "      AND fare_amount < 50\n",
+        "  ) T\n",
+        "ORDER BY\n",
+        "  T.weekday  "
+      ]
+    },
+    {
+      "name": "6afcf39e",
+      "displayName": "kpis_sales_summary_partitioned",
+      "config": {
+        "version": "1.1",
+        "source": "catalog_au.golden.kpis_sales_summary_partitioned",
+        "dimensions": [
+          {
+            "name": "department_id",
+            "expr": "source.department_id",
+            "displayName": "Department Id"
+          },
+          {
+            "name": "is_organic",
+            "expr": "source.is_organic",
+            "displayName": "Is Organic"
+          },
+          {
+            "name": "total_orders",
+            "expr": "source.total_orders",
+            "displayName": "Total Orders"
+          },
+          {
+            "name": "total_reorders",
+            "expr": "source.total_reorders",
+            "displayName": "Total Reorders"
+          },
+          {
+            "name": "avg_add_to_cart_order",
+            "expr": "source.avg_add_to_cart_order",
+            "displayName": "Avg Add To Cart Order"
+          }
+        ],
+        "measures": [
+          {
+            "name": "count",
+            "expr": "COUNT(*)",
+            "comment": "Represents the total number of rows in the dataset. Use this measure to count all",
+            "displayName": "Count"
+          }
+        ]
+      }
+    },
+    {
+      "name": "dd236d68",
+      "displayName": "sales_summary_KPI",
+      "queryLines": [
+        "SELECT \r\n",
+        "  department_id AS Departamento,\r\n",
+        "  is_organic AS Es_Organico,\r\n",
+        "  total_orders AS Ventas_Totales,\r\n",
+        "  total_reorders AS Recompras_Totales,\r\n",
+        "  -- Calculamos el porcentaje de recompra\r\n",
+        "  ROUND((total_reorders / total_orders) * 100, 2) AS Porcentaje_Recompra,\r\n",
+        "  ROUND(avg_add_to_cart_order, 2) AS Posicion_Promedio_Carrito\r\n",
+        "FROM catalog_au.golden.kpis_sales_summary_partitioned"
+      ]
+    },
+    {
+      "name": "4ff4da3d",
+      "displayName": "departments_KPI",
+      "queryLines": [
+        "SELECT \r\n",
+        "  CASE department_id\r\n",
+        "    WHEN 1 THEN 'Congelados'\r\n",
+        "    WHEN 3 THEN 'Panadería'\r\n",
+        "    WHEN 4 THEN 'Frutas y Verduras'\r\n",
+        "    WHEN 7 THEN 'Bebidas'\r\n",
+        "    WHEN 12 THEN 'Carnes y Pescados'\r\n",
+        "    WHEN 13 THEN 'Abarrotes'\r\n",
+        "    WHEN 15 THEN 'Enlatados'\r\n",
+        "    WHEN 16 THEN 'Lácteos y Huevos'\r\n",
+        "    WHEN 19 THEN 'Snacks y Dulces'\r\n",
+        "    ELSE CONCAT('Otro (ID ', department_id, ')')\r\n",
+        "  END AS Departamento,\r\n",
+        "  is_organic AS Es_Organico,\r\n",
+        "  total_orders AS Ventas_Totales,\r\n",
+        "  total_reorders AS Recompras_Totales,\r\n",
+        "  ROUND((total_reorders / total_orders) * 100, 2) AS Porcentaje_Recompra,\r\n",
+        "  ROUND(avg_add_to_cart_order, 2) AS Posicion_Promedio_Carrito\r\n",
+        "FROM catalog_au.golden.kpis_sales_summary_partitioned"
+      ]
+    },
+    {
+      "name": "c16c8e4b",
+      "displayName": "Categorios id_ KPI",
+      "queryLines": [
+        "SELECT DISTINCT\r\n",
+        "  department_id AS ID_Departamento,\r\n",
+        "  CASE department_id\r\n",
+        "    WHEN 1 THEN 'Congelados'\r\n",
+        "    WHEN 2 THEN 'Otros'\r\n",
+        "    WHEN 3 THEN 'Panadería'\r\n",
+        "    WHEN 4 THEN 'Frutas y Verduras'\r\n",
+        "    WHEN 5 THEN 'Alcohol'\r\n",
+        "    WHEN 6 THEN 'Internacional'\r\n",
+        "    WHEN 7 THEN 'Bebidas'\r\n",
+        "    WHEN 8 THEN 'Mascotas'\r\n",
+        "    WHEN 9 THEN 'Pastas y Legumbres'\r\n",
+        "    WHEN 10 THEN 'Venta a Granel'\r\n",
+        "    WHEN 11 THEN 'Cuidado Personal'\r\n",
+        "    WHEN 12 THEN 'Carnes y Pescados'\r\n",
+        "    WHEN 13 THEN 'Despensa'\r\n",
+        "    WHEN 14 THEN 'Desayunos'\r\n",
+        "    WHEN 15 THEN 'Enlatados y Conservas'\r\n",
+        "    WHEN 16 THEN 'Lácteos y Huevos'\r\n",
+        "    WHEN 17 THEN 'Limpieza y Hogar'\r\n",
+        "    WHEN 18 THEN 'Bebés'\r\n",
+        "    WHEN 19 THEN 'Snacks y Dulces'\r\n",
+        "    WHEN 20 THEN 'Fiambrería y Deli'\r\n",
+        "    WHEN 21 THEN 'No Especificado'\r\n",
+        "    ELSE CONCAT('Desconocido (ID ', department_id, ')')\r\n",
+        "  END AS Nombre_Departamento\r\n",
+        "FROM catalog_au.golden.kpis_sales_summary_partitioned\r\n",
+        "ORDER BY ID_Departamento ASC"
+      ]
+    }
+  ],
+  "pages": [
+    {
+      "name": "5a35864d",
+      "displayName": "Summary",
+      "layout": [
+        {
+          "widget": {
+            "name": "ventas-por-departamento-organicos-vs-tradicionales",
+            "queries": [
+              {
+                "name": "main_query",
+                "query": {
+                  "datasetName": "dd236d68",
+                  "fields": [
+                    {
+                      "name": "Es_Organico",
+                      "expression": "`Es_Organico`"
+                    },
+                    {
+                      "name": "Departamento",
+                      "expression": "`Departamento`"
+                    },
+                    {
+                      "name": "Ventas_Totales",
+                      "expression": "`Ventas_Totales`"
+                    }
+                  ],
+                  "disaggregated": true
+                }
+              }
+            ],
+            "spec": {
+              "version": 3,
+              "frame": {
+                "showTitle": true,
+                "title": "Ventas por Departamento: Orgánicos vs Tradicionales"
+              },
+              "mark": {
+                "colors": [
+                  {
+                    "themeColorType": "visualizationColors",
+                    "position": 2
+                  },
+                  {
+                    "themeColorType": "visualizationColors",
+                    "position": 2
+                  },
+                  {
+                    "themeColorType": "visualizationColors",
+                    "position": 3
+                  },
+                  {
+                    "themeColorType": "visualizationColors",
+                    "position": 4
+                  },
+                  {
+                    "themeColorType": "visualizationColors",
+                    "position": 5
+                  },
+                  {
+                    "themeColorType": "visualizationColors",
+                    "position": 6
+                  },
+                  {
+                    "themeColorType": "visualizationColors",
+                    "position": 7
+                  },
+                  {
+                    "themeColorType": "visualizationColors",
+                    "position": 8
+                  },
+                  {
+                    "themeColorType": "visualizationColors",
+                    "position": 9
+                  },
+                  {
+                    "themeColorType": "visualizationColors",
+                    "position": 10
+                  }
+                ]
+              },
+              "widgetType": "bar",
+              "encodings": {
+                "x": {
+                  "fieldName": "Departamento",
+                  "scale": {
+                    "type": "quantitative"
+                  }
+                },
+                "y": {
+                  "fieldName": "Ventas_Totales",
+                  "scale": {
+                    "type": "quantitative"
+                  }
+                },
+                "color": {
+                  "fieldName": "Es_Organico",
+                  "scale": {
+                    "type": "categorical",
+                    "mappings": [
+                      {
+                        "value": "N",
+                        "color": {
+                          "themeColorType": "visualizationColors",
+                          "position": 5
+                        }
+                      },
+                      {
+                        "value": "Y",
+                        "color": {
+                          "themeColorType": "visualizationColors",
+                          "position": 3
+                        }
+                      }
+                    ]
+                  }
+                }
+              }
+            }
+          },
+          "position": {
+            "x": 0,
+            "y": 2,
+            "width": 6,
+            "height": 6
+          }
+        },
+        {
+          "widget": {
+            "name": "1e82a3c6",
+            "queries": [
+              {
+                "name": "dashboards/01f1620a249a12e780870f554973ebee/datasets/01f1620b076f19749af7279e2fb39db0_Es_Organico",
+                "query": {
+                  "datasetName": "dd236d68",
+                  "fields": [
+                    {
+                      "name": "Es_Organico",
+                      "expression": "`Es_Organico`"
+                    },
+                    {
+                      "name": "Es_Organico_associativity",
+                      "expression": "COUNT_IF(`associative_filter_predicate_group`)"
+                    }
+                  ],
+                  "disaggregated": false
+                }
+              }
+            ],
+            "spec": {
+              "version": 2,
+              "frame": {
+                "showTitle": true
+              },
+              "disallowAll": false,
+              "widgetType": "filter-single-select",
+              "encodings": {
+                "fields": [
+                  {
+                    "fieldName": "Es_Organico",
+                    "queryName": "dashboards/01f1620a249a12e780870f554973ebee/datasets/01f1620b076f19749af7279e2fb39db0_Es_Organico"
+                  }
+                ]
+              }
+            }
+          },
+          "position": {
+            "x": 6,
+            "y": 2,
+            "width": 6,
+            "height": 1
+          }
+        },
+        {
+          "widget": {
+            "name": "7130efbc",
+            "multilineTextboxSpec": {
+              "lines": [
+                "<span style=\"font-size: 36px;line-height: 1.5;\">***PRODUCTS CAR ANALYSIS***</span>"
+              ]
+            }
+          },
+          "position": {
+            "x": 0,
+            "y": 0,
+            "width": 10,
+            "height": 2
+          }
+        },
+        {
+          "widget": {
+            "name": "tasa-de-recompra-promedio",
+            "queries": [
+              {
+                "name": "main_query",
+                "query": {
+                  "datasetName": "dd236d68",
+                  "fields": [
+                    {
+                      "name": "avg(Porcentaje_Recompra)",
+                      "expression": "AVG(`Porcentaje_Recompra`)"
+                    }
+                  ],
+                  "disaggregated": false
+                }
+              }
+            ],
+            "spec": {
+              "version": 2,
+              "frame": {
+                "showTitle": true,
+                "title": "Tasa de Recompra Promedio"
+              },
+              "widgetType": "counter",
+              "encodings": {
+                "value": {
+                  "fieldName": "avg(Porcentaje_Recompra)",
+                  "format": {
+                    "type": "number-percent",
+                    "decimalPlaces": {
+                      "type": "all"
+                    },
+                    "significantFigures": {
+                      "type": "exact",
+                      "figures": 3
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "position": {
+            "x": 6,
+            "y": 3,
+            "width": 6,
+            "height": 5
+          }
+        },
+        {
+          "widget": {
+            "name": "prioridad-seleccion-orden-promedio-carrito",
+            "queries": [
+              {
+                "name": "main_query",
+                "query": {
+                  "datasetName": "dd236d68",
+                  "fields": [
+                    {
+                      "name": "Departamento",
+                      "expression": "`Departamento`"
+                    },
+                    {
+                      "name": "avg(Posicion_Promedio_Carrito)",
+                      "expression": "AVG(`Posicion_Promedio_Carrito`)"
+                    }
+                  ],
+                  "disaggregated": false
+                }
+              }
+            ],
+            "spec": {
+              "version": 3,
+              "frame": {
+                "showTitle": true,
+                "title": "Prioridad de Selección (Orden Promedio en Carrito)"
+              },
+              "mark": {
+                "colors": [
+                  {
+                    "themeColorType": "visualizationColors",
+                    "position": 6
+                  },
+                  {
+                    "themeColorType": "visualizationColors",
+                    "position": 2
+                  },
+                  {
+                    "themeColorType": "visualizationColors",
+                    "position": 3
+                  },
+                  {
+                    "themeColorType": "visualizationColors",
+                    "position": 4
+                  },
+                  {
+                    "themeColorType": "visualizationColors",
+                    "position": 5
+                  },
+                  {
+                    "themeColorType": "visualizationColors",
+                    "position": 6
+                  },
+                  {
+                    "themeColorType": "visualizationColors",
+                    "position": 7
+                  },
+                  {
+                    "themeColorType": "visualizationColors",
+                    "position": 8
+                  },
+                  {
+                    "themeColorType": "visualizationColors",
+                    "position": 9
+                  },
+                  {
+                    "themeColorType": "visualizationColors",
+                    "position": 10
+                  }
+                ]
+              },
+              "widgetType": "bar",
+              "encodings": {
+                "x": {
+                  "fieldName": "Departamento",
+                  "scale": {
+                    "type": "quantitative"
+                  }
+                },
+                "y": {
+                  "fieldName": "avg(Posicion_Promedio_Carrito)",
+                  "scale": {
+                    "type": "quantitative"
+                  }
+                }
+              }
+            }
+          },
+          "position": {
+            "x": 0,
+            "y": 8,
+            "width": 12,
+            "height": 6
+          }
+        },
+        {
+          "widget": {
+            "name": "64908e13",
+            "queries": [
+              {
+                "name": "main_query",
+                "query": {
+                  "datasetName": "dd236d68",
+                  "fields": [
+                    {
+                      "name": "sum(Ventas_Totales)",
+                      "expression": "SUM(`Ventas_Totales`)"
+                    },
+                    {
+                      "name": "Es_Organico",
+                      "expression": "`Es_Organico`"
+                    }
+                  ],
+                  "disaggregated": false
+                }
+              }
+            ],
+            "spec": {
+              "version": 3,
+              "mark": {
+                "colors": [
+                  {
+                    "themeColorType": "visualizationColors",
+                    "position": 4
+                  },
+                  {
+                    "themeColorType": "visualizationColors",
+                    "position": 2
+                  },
+                  {
+                    "themeColorType": "visualizationColors",
+                    "position": 3
+                  },
+                  {
+                    "themeColorType": "visualizationColors",
+                    "position": 4
+                  },
+                  {
+                    "themeColorType": "visualizationColors",
+                    "position": 5
+                  },
+                  {
+                    "themeColorType": "visualizationColors",
+                    "position": 6
+                  },
+                  {
+                    "themeColorType": "visualizationColors",
+                    "position": 7
+                  },
+                  {
+                    "themeColorType": "visualizationColors",
+                    "position": 8
+                  },
+                  {
+                    "themeColorType": "visualizationColors",
+                    "position": 9
+                  },
+                  {
+                    "themeColorType": "visualizationColors",
+                    "position": 10
+                  }
+                ]
+              },
+              "widgetType": "pie",
+              "encodings": {
+                "angle": {
+                  "fieldName": "sum(Ventas_Totales)",
+                  "scale": {
+                    "type": "quantitative"
+                  },
+                  "format": {
+                    "type": "number-plain",
+                    "abbreviation": "compact",
+                    "decimalPlaces": {
+                      "type": "max",
+                      "places": 2
+                    }
+                  }
+                },
+                "color": {
+                  "fieldName": "Es_Organico",
+                  "scale": {
+                    "type": "categorical",
+                    "mappings": [
+                      {
+                        "value": "N",
+                        "color": {
+                          "themeColorType": "visualizationColors",
+                          "position": 5
+                        }
+                      },
+                      {
+                        "value": "Y",
+                        "color": {
+                          "themeColorType": "visualizationColors",
+                          "position": 3
+                        }
+                      }
+                    ]
+                  }
+                },
+                "label": {
+                  "show": false
+                }
+              }
+            }
+          },
+          "position": {
+            "x": 0,
+            "y": 14,
+            "width": 6,
+            "height": 6
+          }
+        },
+        {
+          "widget": {
+            "name": "tabla-detalle-kpis-rendimiento-categoria",
+            "queries": [
+              {
+                "name": "main_query",
+                "query": {
+                  "datasetName": "4ff4da3d",
+                  "fields": [
+                    {
+                      "name": "Departamento",
+                      "expression": "`Departamento`"
+                    },
+                    {
+                      "name": "Es_Organico",
+                      "expression": "`Es_Organico`"
+                    },
+                    {
+                      "name": "Ventas_Totales",
+                      "expression": "`Ventas_Totales`"
+                    },
+                    {
+                      "name": "Porcentaje_Recompra",
+                      "expression": "`Porcentaje_Recompra`"
+                    },
+                    {
+                      "name": "Posicion_Promedio_Carrito",
+                      "expression": "`Posicion_Promedio_Carrito`"
+                    }
+                  ],
+                  "disaggregated": true
+                }
+              }
+            ],
+            "spec": {
+              "version": 2,
+              "frame": {
+                "showTitle": true,
+                "title": "Tabla de Detalle: KPIs de Rendimiento por Categoría"
+              },
+              "widgetType": "table",
+              "encodings": {
+                "columns": [
+                  {
+                    "fieldName": "Departamento"
+                  },
+                  {
+                    "fieldName": "Es_Organico"
+                  },
+                  {
+                    "fieldName": "Ventas_Totales"
+                  },
+                  {
+                    "fieldName": "Porcentaje_Recompra"
+                  },
+                  {
+                    "fieldName": "Posicion_Promedio_Carrito"
+                  }
+                ],
+                "rowOrder": [
+                  {
+                    "by": "column-reversed",
+                    "field": {
+                      "index": 2
+                    }
+                  }
+                ]
+              }
+            }
+          },
+          "position": {
+            "x": 6,
+            "y": 14,
+            "width": 6,
+            "height": 6
+          }
+        },
+        {
+          "widget": {
+            "name": "diccionario-categorias-id-vs-nombre",
+            "queries": [
+              {
+                "name": "main_query",
+                "query": {
+                  "datasetName": "c16c8e4b",
+                  "fields": [
+                    {
+                      "name": "ID_Departamento",
+                      "expression": "`ID_Departamento`"
+                    },
+                    {
+                      "name": "Nombre_Departamento",
+                      "expression": "`Nombre_Departamento`"
+                    }
+                  ],
+                  "disaggregated": true
+                }
+              }
+            ],
+            "spec": {
+              "version": 2,
+              "frame": {
+                "showTitle": true,
+                "title": "Diccionario de Categorías (ID vs Nombre)"
+              },
+              "widgetType": "table",
+              "encodings": {
+                "columns": [
+                  {
+                    "fieldName": "ID_Departamento"
+                  },
+                  {
+                    "fieldName": "Nombre_Departamento"
+                  }
+                ],
+                "rowOrder": [
+                  {
+                    "by": "column-reversed",
+                    "field": {
+                      "index": 0
+                    }
+                  }
+                ]
+              }
+            }
+          },
+          "position": {
+            "x": 0,
+            "y": 20,
+            "width": 6,
+            "height": 6
+          }
+        }
+      ],
+      "pageType": "PAGE_TYPE_CANVAS",
+      "layoutVersion": "GRID_V1"
+    }
+  ],
+  "uiSettings": {
+    "theme": {
+      "widgetHeaderAlignment": "ALIGNMENT_UNSPECIFIED"
+    },
+    "genieSpace": {
+      "isEnabled": true,
+      "enablementMode": "ENABLED"
+    },
+    "applyModeEnabled": false
+  }
+}
