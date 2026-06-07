@@ -38,9 +38,20 @@ La arquitectura garantiza un aislamiento físico y lógico total. La gobernanza 
 Datasets de Origen (Instacart)
 
 Se seleccionó el dataset público de Instacart disponible en Kaggle debido a su volumen (millones de filas) y a su estructura fiel a un modelo relacional de negocio:
-Archivo plano (CSV),Descripción técnica,Tamaño en disco
-order_products__train.csv,"Tabla de hechos. Registra qué productos pertenecen a qué orden, su posición de entrada al carrito y si es una recompra.",~24 MB (~1.3 millones de filas)
-products.csv,Tabla de dimensión. Contiene el catálogo maestro de identificadores de productos asociados a sus nombres y categorías.,"~2.1 MB (~50,000 filas)"
+
+ disponibles, trabajé con 4:
+
+Archivo	Descripción	Filas aprox.
+olist_orders_dataset.csv	Órdenes de compra — estado, timestamps	99.441
+olist_order_items_dataset.csv	Ítems por orden — precio y flete	112.650
+olist_order_reviews_dataset.csv	Reseñas de clientes — score 1 a 5	99.224
+olist_customers_dataset.csv	Clientes — ciudad y estado	99.441
+Una vez descargados, subí los 4 CSVs al contenedor raw del Storage Account antes de ejecutar el pipeline.
+
+
+
+
+
 
 
 
