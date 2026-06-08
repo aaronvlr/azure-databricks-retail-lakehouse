@@ -108,10 +108,10 @@ El traslado de código y orquestación desde el entorno de Desarrollo hacia el W
 
 1. Creacion de secrets: Los secrets que configuré en el repositorio con un periodo o vigencia de 90 dias (mas que suficiente para entregar proyecto):
 
-DATABRICKS_ORIGIN_HOST — URL del workspace de construcción
-DATABRICKS_ORIGIN_TOKEN — token del workspace de construcción
-DATABRICKS_DEST_HOST — URL del workspace de producción
-DATABRICKS_DEST_TOKEN — token del workspace de producción
+*DATABRICKS_ORIGIN_HOST — URL del workspace de construcción
+*DATABRICKS_ORIGIN_TOKEN — token del workspace de construcción
+*DATABRICKS_DEST_HOST — URL del workspace de producción
+*DATABRICKS_DEST_TOKEN — token del workspace de producción
 
 2. Extracción en DEV: Exporta en caliente los notebooks en formato plano desde el espacio de desarrollo.
 3. Despliegue en PROD: Importa y sobreescribe los notebooks en la ruta compartida de producción (/Workspace/Production/trabajo_final/proceso).
