@@ -58,7 +58,7 @@ Durante la fase de ingesta (Notebooks de Bronze), PySpark lee los archivos CSV c
 
 <img width="736" height="205" alt="imagen" src="https://github.com/user-attachments/assets/80ec5ff0-d1c0-4047-a6fb-a4c708b0c8d0" />
 
-Orquestación y Resiliencia del Pipeline (Workflows & Rollback)
+Orquestación y Resiliencia del Pipeline (Workflows) & Rollback (Reversion)
 
 El flujo de procesamiento no depende de ejecuciones manuales ni de cuadernos maestros antiguos; se encuentra completamente automatizado mediante Databricks Workflows bajo el Job denominado ETL-PROJECT1. Las tareas se ejecutan siguiendo un Grafo Acíclico Dirigido (DAG) optimizado:
 
@@ -97,6 +97,8 @@ La tabla resultante se denomina catalog_au.golden.kpis_sales_summary_partitioned
 | `avg_add_to_cart_order` | `DOUBLE` | Métrica. Promedio del orden de inserción en el carrito (Prioridad de compra). |
 | `ingestion_date` | `TIMESTAMP` | Auditoría. Marca de tiempo del procesamiento final. |
 
+Mecanismo de Reversión (Rollback Automatizado)
+Se creo un workflow de reversion, en caso de que saliera algo mal por problemas del codigo o falta de alguna configuracion no acorde a el objetivo. Este notebook se llama "Drop_medallion_reversion_GITHUB" se encarga de eliminar las tablas que se hayan creado de las capas medallion de bronze, silver y golden, ademas de tambien eliminar los external location creados a los containers en azure de bronze, silver y golden. 
 
 Optimización de Rendimiento
 
