@@ -98,6 +98,7 @@ La tabla resultante se denomina catalog_au.golden.kpis_sales_summary_partitioned
 | `ingestion_date` | `TIMESTAMP` | Auditoría. Marca de tiempo del procesamiento final. |
 
 Mecanismo de Reversión (Rollback Automatizado)
+
 Se creo un workflow de reversion, en caso de que saliera algo mal por problemas del codigo o falta de alguna configuracion no acorde a el objetivo. Este notebook se llama "Drop_medallion_reversion_GITHUB" se encarga de eliminar las tablas que se hayan creado de las capas medallion de bronze, silver y golden, ademas de tambien eliminar los external location creados a los containers en azure de bronze, silver y golden. 
 
 Optimización de Rendimiento
@@ -111,8 +112,11 @@ El traslado de código y orquestación desde el entorno de Desarrollo hacia el W
 1. Creacion de secrets: Los secrets que configuré en el repositorio con un periodo o vigencia de 90 dias (mas que suficiente para entregar proyecto):
 
 *DATABRICKS_ORIGIN_HOST — URL del workspace de construcción
+
 *DATABRICKS_ORIGIN_TOKEN — token del workspace de construcción
+
 *DATABRICKS_DEST_HOST — URL del workspace de producción
+
 *DATABRICKS_DEST_TOKEN — token del workspace de producción
 
 2. Extracción en DEV: Exporta en caliente los notebooks en formato plano desde el espacio de desarrollo.
