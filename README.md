@@ -120,7 +120,7 @@ El traslado de código y orquestación desde el entorno de Desarrollo hacia el W
 *DATABRICKS_DEST_TOKEN — token del workspace de producción
 
 2. Extracción en DEV: Exporta en caliente los notebooks en formato plano desde el espacio de desarrollo.
-3. Despliegue en PROD: Importa y sobreescribe los notebooks en la ruta compartida de producción (/Workspace/Production/trabajo_final/proceso).
+3. Despliegue en PROD: Importa y sobreescribe los notebooks en la ruta compartida de producción (/Workspace/Production/retail_lakehouse_etl/proceso).
 4. Búsqueda Dinámica de Infraestructura: Invoca la API de clusters de Databricks para localizar el clúster activo de producción por su nombre (cluster_SD) y extrae su ID dinámico.
 5. Recreación del Job: Inyecta el ID del clúster de producción y el JSON detallado de las 6 tareas reales del Workflow, actualizando o recreando el Job en el entorno productivo de forma transparente.
 
