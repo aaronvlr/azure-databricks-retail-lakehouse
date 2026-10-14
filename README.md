@@ -8,28 +8,28 @@ El pipeline procesa millones de transacciones de compra y catálogos de alimento
 
 <img width="1024" height="559" alt="imagen" src="https://github.com/user-attachments/assets/2a9d8d85-c18d-40cb-8a68-ab57eaf1fa44" />
 
-¿Qué se implementó en este proyecto?
+## ¿Qué se implementó en este proyecto?
 
 A partir de archivos planos masivos con registros de carritos de compra y catálogos de productos, se construyó un ecosistema de datos robusto que limpia, enriquece y consolida la información para responder preguntas estratégicas de negocio (por ejemplo, analizar la cuota de mercado de productos orgánicos y la prioridad de selección de alimentos por departamento).
 Para simular un entorno corporativo real, el proyecto abarca desde la preparación de infraestructura aislada en entornos de Desarrollo (DEV) y Producción (PROD), la gobernanza de datos con Unity Catalog mediante External Locations securizadas, la orquestación visual de jobs con rutas de mitigación de errores (Rollback automatizado), hasta el despliegue continuo de código (CI/CD) controlado por GitHub Actions.
 
-Stack Tecnológico Utilizado
+## Stack Tecnológico Utilizado
 
-    Azure Databricks — Entorno unificado de ejecución y cómputo Spark.
+- **Azure Databricks** — Entorno unificado de ejecución y cómputo Spark.
 
-    PySpark (Apache Spark) — Motor principal para procesamiento distribuido y transformaciones a gran escala.
+- **PySpark (Apache Spark)** — Motor principal para procesamiento distribuido y transformaciones a gran escala.
 
-    Delta Lake — Formato de almacenamiento open-source que aporta transacciones ACID y Time Travel al Data Lake.
+- **Delta Lake** — Formato de almacenamiento open-source que aporta transacciones ACID y Time Travel al Data Lake.
 
-    Unity Catalog — Herramienta de gobernanza centralizada para control de accesos, credenciales y auditoría.
+- **Unity Catalog** — Herramienta de gobernanza centralizada para control de accesos, credenciales y auditoría.
 
-    Azure Data Lake Storage Gen2 (ADLS Gen2) — Almacenamiento físico en la nube estructurado en entornos DEV y PROD.
+- **Azure Data Lake Storage Gen2 (ADLS Gen2)** — Almacenamiento físico en la nube estructurado en entornos DEV y PROD.
 
-    GitHub Actions — Orquestador de Integración y Despliegue Continuo (CI/CD) mediante flujos YAML.
+- **GitHub Actions** — Orquestador de Integración y Despliegue Continuo (CI/CD) mediante flujos YAML.
 
-    Databricks Dashboards — Motor nativo para reportería interactiva y visualización SQL.
+- **Databricks Dashboards** — Motor nativo para reportería interactiva y visualización SQL.
 
-Arquitectura diseñada
+## Arquitectura diseñada
 
 <img width="1024" height="558" alt="imagen" src="https://github.com/user-attachments/assets/1ed4c0eb-46b4-4f40-a589-37ccc57423d3" />
 
@@ -46,7 +46,7 @@ Se seleccionó el dataset público de Instacart disponible en Kaggle debido a su
 
 Ambos archivos se cargaron inicialmente de forma manual en el contenedor raw del Storage Account de Azure para iniciar el flujo de ingesta.
 
-Inicialización e Ingesta del Entorno (Raw a Bronze)
+## Inicialización e Ingesta del Entorno (Raw a Bronze)
 
 Todos los scripts SQL iniciales de gobernanza (creación de catálogos unificados, esquemas de base de datos, credenciales de almacenamiento y asignación de ubicaciones externas como exlt-raw, exlt-bronze, exlt-silver y exlt-golden) se encuentran centralizados en la carpeta de configuración del repositorio. Estos componentes actúan como pre-requisito técnico, aislando por completo las capas físicas y otorgando permisos de lectura y escritura seguros mediante Unity Catalog.
 
@@ -58,13 +58,13 @@ Durante la fase de ingesta (Notebooks de Bronze), PySpark lee los archivos CSV c
 
 <img width="736" height="205" alt="imagen" src="https://github.com/user-attachments/assets/80ec5ff0-d1c0-4047-a6fb-a4c708b0c8d0" />
 
-Orquestación y Resiliencia del Pipeline (Workflows) & Rollback (Reversion)
+## Orquestación y Resiliencia del Pipeline (Workflows) & Rollback (Reversion)
 
 El flujo de procesamiento no depende de ejecuciones manuales ni de cuadernos maestros antiguos; se encuentra completamente automatizado mediante Databricks Workflows bajo el Job denominado ETL-PROJECT1. Las tareas se ejecutan siguiendo un Grafo Acíclico Dirigido (DAG) optimizado:
 
 <img width="1168" height="207" alt="imagen" src="https://github.com/user-attachments/assets/302573fe-87a8-4b23-a3cd-49a0301ae053" />
 
-Transformaciones Aplicadas (Bronze a Silver)
+## Transformaciones Aplicadas (Bronze a Silver)
 
 En la capa intermedia (Silver), el objetivo es unificar los datos crudos y aplicar lógica de negocio avanzada. Se lee de Bronze, se eliminan registros completamente nulos y se realiza un Inner Join optimizado a través de la llave común product_id. Durante este paso, se calcularon tres métricas analíticas clave:
 
@@ -82,7 +82,7 @@ En la capa intermedia (Silver), el objetivo es unificar los datos crudos y aplic
 
 Los campos resultantes se ordenan de manera exacta y secuencial para poblar de forma segura la tabla unificada de la capa Silver: catalog_au.silver.products_orders_enriched.
 
-Modelo de Datos Analítico (Silver a Gold)
+## Modelo de Datos Analítico (Silver a Gold)
 
 La capa final (Gold) está diseñada para la disponibilización de datos estructurados para el consumo de analistas de negocio y directores. Aquí, los datos atómicos a nivel de fila se reducen mediante agregaciones paralelas y se agrupan cruzando dos dimensiones de análisis fundamentales: department_id y la bandera is_organic.
 
@@ -97,19 +97,19 @@ La tabla resultante se denomina catalog_au.golden.kpis_sales_summary_partitioned
 | `avg_add_to_cart_order` | `DOUBLE` | Métrica. Promedio del orden de inserción en el carrito (Prioridad de compra). |
 | `ingestion_date` | `TIMESTAMP` | Auditoría. Marca de tiempo del procesamiento final. |
 
-Mecanismo de Reversión (Rollback Automatizado)
+## Mecanismo de Reversión (Rollback Automatizado)
 
-Se creo un workflow de reversion, en caso de que saliera algo mal por problemas del codigo o falta de alguna configuracion no acorde a el objetivo. Este notebook se llama "Drop_medallion_reversion_GITHUB" se encarga de eliminar las tablas que se hayan creado de las capas medallion de bronze, silver y golden, ademas de tambien eliminar los external location creados a los containers en azure de bronze, silver y golden. 
+Se implementó una tarea de contingencia automatizada (Drop_medallion_reversion_GITHUB) diseñada para revertir la transacción en caso de fallos críticos de ejecución o validación. Este flujo limpia de forma controlada las tablas Delta de las capas Bronze, Silver y Gold, así como las External Locations asociadas, garantizando la idempotencia del pipeline.
 
-Optimización de Rendimiento
+## Optimización de Rendimiento
 
 Para maximizar la velocidad de las consultas analíticas y reportes interactivos, la tabla Gold fue físicamente estructurada en el Data Lake utilizando la cláusula PARTITIONED BY (is_organic). Esto divide los archivos Delta en directorios independientes según la bandera de orgánicos, forzando a Spark a leer únicamente las carpetas necesarias mediante el mecanismo de Partition Pruning.
 
-Automatización y Despliegue Continuo (CI/CD)
+## Automatización y Despliegue Continuo (CI/CD)
 
 El traslado de código y orquestación desde el entorno de Desarrollo hacia el Workspace de Producción está completamente automatizado a través de un pipeline en GitHub Actions (.github/workflows/script3.yml). Al realizar un push a la rama main, el flujo ejecuta secuencialmente:
 
-1. Creacion de secrets: Los secrets que configuré en el repositorio con un periodo o vigencia de 90 dias (mas que suficiente para entregar proyecto):
+1. Configuración de Secrets: Credenciales de entorno configuradas en GitHub Secrets bajo políticas corporativas de rotación cada 90 días:
 
 *DATABRICKS_ORIGIN_HOST — URL del workspace de construcción
 
@@ -124,7 +124,7 @@ El traslado de código y orquestación desde el entorno de Desarrollo hacia el W
 4. Búsqueda Dinámica de Infraestructura: Invoca la API de clusters de Databricks para localizar el clúster activo de producción por su nombre (cluster_SD) y extrae su ID dinámico.
 5. Recreación del Job: Inyecta el ID del clúster de producción y el JSON detallado de las 6 tareas reales del Workflow, actualizando o recreando el Job en el entorno productivo de forma transparente.
 
-Capa de Visualización Analítica (Dashboard Lakeview)
+## Capa de Visualización Analítica (Dashboard Lakeview)
 
 Para consumir la información de la tabla Golden, se construyó un Dashboard interactivo nativo dentro de Databricks estructurado mediante dos consultas SQL optimizadas:
 
