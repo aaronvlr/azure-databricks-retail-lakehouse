@@ -1,4 +1,4 @@
-Resumen del Proyecto ETL - Instacart Market Basket Analysis en Azure Databricks
+azure-databricks-retail-lakehouse - Instacart Market Basket Analysis en Azure Databricks
 
 Este proyecto fue desarrollado con el objetivo de diseñar e implementar un pipeline de datos integral (End-to-End) utilizando tecnologías de Big Data en la nube. El propósito principal es tomar un conjunto de datos masivo y real del supermercado Instacart, estructurarlo mediante buenas prácticas de ingeniería y disponibilizar métricas comerciales clave listas para la toma de decisiones empresariales.
 
@@ -135,4 +135,4 @@ Para consumir la información de la tabla Golden, se construyó un Dashboard int
 <img width="1671" height="843" alt="imagen" src="https://github.com/user-attachments/assets/1c9bd6cb-a5e0-456c-a50b-dc1c284b180b" />
 
 Autor
-Proyecto desarrollado e implementado por Aaron Vargas como entregable final y aprendizaje en ingeniería de datos con Azure Databricks.
+Solución de Ingeniería de Datos diseñada e implementada por Aaron Vargas | Data Engineer & Cloud Data Solutions. Arquitectura orientada a entornos de producción con procesamiento distribuido en PySpark, gobierno de datos en Unity Catalog y despliegue continuo (CI/CD) sobre Microsoft Azure y Databricks.
