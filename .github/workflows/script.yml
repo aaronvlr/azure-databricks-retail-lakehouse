@@ -17,7 +17,7 @@ jobs:
       run: |
         ORIGIN_HOST=${{ secrets.DATABRICKS_ORIGIN_HOST }}
         ORIGIN_TOKEN=${{ secrets.DATABRICKS_ORIGIN_TOKEN }}
-        NOTEBOOK_BASE="/Workspace/Users/aaronandres98@hotmail.com/databrick_trabajo_final/proceso"
+        NOTEBOOK_BASE="/Workspace/Users/aaronandres98@hotmail.com/retail_lakehouse_etl/proceso"
         NOTEBOOKS=("1.- Preparacion_Ambiente_Proceso_GITHUB" "2.- Ingest order_products_train_Proceso_GITHUB" "2.- Ingest products_Proceso_GITHUB" "3.- Transform_Proceso_GITHUB" "4.- Load_Proceso_GITHUB" "5.- Grants-Medallion_Seguridad_GITHUB")  # Agrega más según necesitesas
         mkdir -p notebooks_to_deploy
         for nb in "${NOTEBOOKS[@]}"; do
@@ -115,11 +115,11 @@ jobs:
       run: |
         DEST_HOST=${{ secrets.DATABRICKS_DEST_HOST }}
         DEST_TOKEN=${{ secrets.DATABRICKS_DEST_TOKEN }}
-        DEST_BASE="/Workspace/Production/trabajo_final"
+        DEST_BASE="/Workspace/Production/retail_lakehouse_etl"
         CLUSTER_ID="${{ env.CLUSTER_ID }}"
         
         # === CONFIGURACIÓN DE VARIABLES DE PRODUCCIÓN ===
-        DEST_BASE="/Workspace/Production/trabajo_final"
+        DEST_BASE="/Workspace/Production/retail_lakehouse_etl"
         PROD_STORAGE_NAME="adlsproject1prod" # <-- REEMPLAZA AQUÍ con el nombre del Data Lake de producción
         CATALOGO_PROD="catalog_au"
 
