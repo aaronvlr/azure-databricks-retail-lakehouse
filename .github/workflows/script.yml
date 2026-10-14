@@ -17,7 +17,7 @@ jobs:
       run: |
         ORIGIN_HOST=${{ secrets.DATABRICKS_ORIGIN_HOST }}
         ORIGIN_TOKEN=${{ secrets.DATABRICKS_ORIGIN_TOKEN }}
-        NOTEBOOK_BASE="/Workspace/Users/aaronandres98@hotmail.com/databrick_trabajo_final/proceso"
+        NOTEBOOK_BASE="/Workspace/Users/aaronandres98@hotmail.com/retail_lakehouse_etl/proceso"
         NOTEBOOKS=("1.- Preparacion_Ambiente_Proceso_GITHUB" "2.- Ingest order_products_train_Proceso_GITHUB" "2.- Ingest products_Proceso_GITHUB" "3.- Transform_Proceso_GITHUB" "4.- Load_Proceso_GITHUB" "5.- Grants-Medallion_Seguridad_GITHUB")  # Agrega más según necesitesas
         mkdir -p notebooks_to_deploy
         for nb in "${NOTEBOOKS[@]}"; do
