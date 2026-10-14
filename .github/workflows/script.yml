@@ -115,11 +115,11 @@ jobs:
       run: |
         DEST_HOST=${{ secrets.DATABRICKS_DEST_HOST }}
         DEST_TOKEN=${{ secrets.DATABRICKS_DEST_TOKEN }}
-        DEST_BASE="/Workspace/Production/trabajo_final"
+        DEST_BASE="/Workspace/Production/retail_lakehouse_etl"
         CLUSTER_ID="${{ env.CLUSTER_ID }}"
         
         # === CONFIGURACIÓN DE VARIABLES DE PRODUCCIÓN ===
-        DEST_BASE="/Workspace/Production/trabajo_final"
+        DEST_BASE="/Workspace/Production/retail_lakehouse_etl"
         PROD_STORAGE_NAME="adlsproject1prod" # <-- REEMPLAZA AQUÍ con el nombre del Data Lake de producción
         CATALOGO_PROD="catalog_au"
 
