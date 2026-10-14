@@ -35,7 +35,7 @@ Para simular un entorno corporativo real, el proyecto abarca desde la preparaci�
 
 La arquitectura garantiza un aislamiento físico y lógico total. La gobernanza se administra estrictamente en Unity Catalog vinculando el almacenamiento a través de Storage Credentials (identidades administradas) y External Locations fijas asignadas a la raíz de cada contenedor del Data Lake.
 
-Datasets de Origen (Instacart)
+## Datasets de Origen (Instacart)
 
 Se seleccionó el dataset público de Instacart disponible en Kaggle debido a su volumen (millones de filas) y a su estructura fiel a un modelo relacional de negocio:
 
